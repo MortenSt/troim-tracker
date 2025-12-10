@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Trøim Cycle Tracker</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;       /* Dark Slate Background */
+            --card-bg: #1e293b;        /* Lighter Slate Card */
+            --text-primary: #f8fafc;   /* White Text */
+            --text-secondary: #94a3b8; /* Grey Text */
+            
+            /* Phase Colors */
+            --accent-build: #3b82f6;   /* Blue */
+            --accent-harvest: #22c55e; /* Green */
+            --accent-exit: #ef4444;    /* Red */
+            --accent-pivot: #eab308;   /* Yellow */
+            --accent-stealth: #a855f7; /* Purple */
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Courier New', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #334155;
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; }
+        .subtitle { color: var(--text-secondary); font-size: 1rem; margin-top: 5px; }
+        
+        .status-pill {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--accent-harvest);
+            color: var(--accent-harvest);
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* GRID LAYOUT */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* CARD COMPONENT */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 6px solid;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        /* CARD HEADER */
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .ticker-box { display: flex; flex-direction: column; }
+        .ticker { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
+        .company-name { font-size: 0.9rem; color: var(--text-secondary); }
+        
+        /* PHASE BADGES */
+        .phase-badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Phase Styling Logic */
+        .build { border-color: var(--accent-build); }
+        .build .phase-badge { background: rgba(59, 130, 246, 0.15); color: var(--accent-build); }
+        
+        .harvest { border-color: var(--accent-harvest); }
+        .harvest .phase-badge { background: rgba(34, 197, 94, 0.15); color: var(--accent-harvest); }
+        
+        .exit { border-color: var(--accent-exit); }
+        .exit .phase-badge { background: rgba(239, 68, 68, 0.15); color: var(--accent-exit); }
+
+        .pivot { border-color: var(--accent-pivot); }
+        .pivot .phase-badge { background: rgba(234, 179, 8, 0.15); color: var(--accent-pivot); }
+
+        .stealth { border-color: var(--accent-stealth); }
+        .stealth .phase-badge { background: rgba(168, 85, 247, 0.15); color: var(--accent-stealth); }
+
+        /* PROGRESS BAR */
+        .progress-container {
+            background: #334155;
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-bar { height: 100%; border-radius: 4px; }
+
+        /* DATA LIST */
+        .metrics { list-style: none; padding: 0; font-size: 0.95rem; color: var(--text-secondary); }
+        .metrics li { 
+            margin-bottom: 12px; 
+            display: flex; 
+            justify-content: space-between;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 8px;
+        }
+        .metrics li:last-child { border-bottom: none; }
+        .metrics strong { color: var(--text-primary); }
+
+        /* BUTTONS */
+        .btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: #334155;
+            color: #fff;
+            padding: 12px 0;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #475569; }
+
+        footer { 
+            text-align: center; 
+            margin-top: 60px; 
+            padding-top: 20px;
+            border-top: 1px solid #334155;
+            color: var(--text-secondary); 
+            font-size: 0.8rem; 
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>THE TRØIM TRACKER</h1>
+    <div class="subtitle">Monitoring the Lifecycle of Tor Olav Trøim's Asset Plays</div>
+    <div class="status-pill">MARKET STATUS: ACTIVE ROTATION (DEC 2025)</div>
+</header>
+
+<div class="grid">
+
+    <div class="card build">
+        <div class="card-header">
+            <div class="ticker-box">
+                <div class="ticker">BRUT</div>
+                <div class="company-name">Bruton Limited</div>
+            </div>
+            <span class="phase-badge">Phase 1: BUILD</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 25%; background: var(--accent-build);"></div>
+        </div>
+        <ul class="metrics">
+            <li><span>Fleet:</span> <strong>4-8 VLCCs (Orderbook)</strong></li>
+            <li><span>Yard:</span> <strong>New Times (China)</strong></li>
+            <li><span>Strategy:</span> <strong>Cash Burn / Equity Raise</strong></li>
+            <li><span>Catalyst:</span> <strong>Andes Merger / 1st Delivery</strong></li>
+        </ul>
+        <a href="https://newsweb.oslobors.no/search?category=&issuer=BRUT" target="_blank" class="btn">View BRUT Filings</a>
+    </div>
+
+    <div class="card harvest">
+        <div class="card-header">
+            <div class="ticker-box">
+                <div class="ticker">HSHP</div>
+                <div class="company-name">Himalaya Shipping</div>
+            </div>
+            <span class="phase-badge">Phase 2: HARVEST</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 85%; background: var(--accent-harvest);"></div>
+        </div>
+        <ul class="metrics">
+            <li><span>Fleet:</span> <strong>12 Newcastlemax (Live)</strong></li>
+            <li><span>Rate:</span> <strong>~$40k/day (Nov 2025)</strong></li>
+            <li><span>Dividend:</span> <strong>$0.10/mo (Paying)</strong></li>
+            <li><span>Risk:</span> <strong>Exit Rumors (Fixed Rates)</strong></li>
+        </ul>
+        <a href="https://newsweb.oslobors.no/search?category=&issuer=HSHP" target="_blank" class="btn">View HSHP Filings</a>
+    </div>
+
+    <div class="card exit">
+        <div class="card-header">
+            <div class="ticker-box">
+                <div class="ticker">2020</div>
+                <div class="company-name">2020 Bulkers</div>
+            </div>
+            <span class="phase-badge">Phase 3: EXIT</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 98%; background: var(--accent-exit);"></div>
+        </div>
+        <ul class="metrics">
+            <li><span>Status:</span> <strong>Liquidation Mode</strong></li>
+            <li><span>Last Action:</span> <strong>Sold 'Bulk Sydney/Santos'</strong></li>
+            <li><span>Payout:</span> <strong>Return of Capital</strong></li>
+            <li><span>Legacy:</span> <strong>Capital Rotated to HSHP/BRUT</strong></li>
+        </ul>
+        <a href="https://newsweb.oslobors.no/search?category=&issuer=2020" target="_blank" class="btn">View 2020 Filings</a>
+    </div>
+
+    <div class="card pivot">
+        <div class="card-header">
+            <div class="ticker-box">
+                <div class="ticker">BORR</div>
+                <div class="company-name">Borr Drilling</div>
+            </div>
+            <span class="phase-badge">Phase 4: PIVOT</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 60%; background: var(--accent-pivot);"></div>
+        </div>
+        <ul class="metrics">
+            <li><span>Status:</span> <strong>Re-Loading / M&A</strong></li>
+            <li><span>Recent:</span> <strong>Acquired 5 Rigs (Noble)</strong></li>
+            <li><span>Market:</span> <strong>Jack-up Supercycle</strong></li>
+            <li><span>Focus:</span> <strong>Debt Refi & Dividends</strong></li>
+        </ul>
+        <a href="https://newsweb.oslobors.no/search?category=&issuer=BORR" target="_blank" class="btn">View BORR Filings</a>
+    </div>
+
+    <div class="card stealth">
+        <div class="card-header">
+            <div class="ticker-box">
+                <div class="ticker">???</div>
+                <div class="company-name">Discovery Engine</div>
+            </div>
+            <span class="phase-badge">Phase 0: STEALTH</span>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 15%; background: var(--accent-stealth); opacity: 0.8;"></div>
+        </div>
+        <ul class="metrics">
+            <li><span>Entity Watch:</span> <strong>"Andes" (Bermuda/UK/NO)</strong></li>
+            <li><span>Yard Watch:</span> <strong>New Times Shipyard (China)</strong></li>
+            <li><span>People Watch:</span> <strong>Gunnar W. Eliassen (Magni)</strong></li>
+            <li><span>Sector Rumor:</span> <strong>Ammonia / Carbon Capture</strong></li>
+        </ul>
+        <a href="https://find-and-update.company-information.service.gov.uk/search/officers?q=Gunnar+Winther+Eliassen" target="_blank" class="btn">Check UK Director Moves</a>
+    </div>
+
+</div>
+
+<footer>
+    <p><strong>The Trøim Playbook:</strong> Buy Cheap (Build) &rarr; Dividend Heavy (Harvest) &rarr; Sell High (Exit) &rarr; Repeat.</p>
+    <p style="font-size: 0.7rem; margin-top: 10px;">Generated for personal tracking. Not financial advice.</p>
+</footer>
+
+</body>
+</html>
